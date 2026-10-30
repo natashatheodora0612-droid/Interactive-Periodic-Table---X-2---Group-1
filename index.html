@@ -1,0 +1,694 @@
+
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Periodic Space | Interactive Periodic Table X-2 - Group 1</title>
+
+<style>
+:root{
+  --bg:#0c0b18;
+  --panel:#171529;
+  --panel2:#201d3b;
+  --text:#f5f3ff;
+  --muted:#a6a1c4;
+  --accent:#9b87ff;
+  --border:#353052;
+}
+body.light{
+  --bg:#f4f2ff;
+  --panel:#ffffff;
+  --panel2:#eeebff;
+  --text:#252044;
+  --muted:#77718f;
+  --accent:#7056e8;
+  --border:#ded8f5;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;background:var(--bg);color:var(--text);
+  font-family:Inter,Arial,sans-serif;transition:.25s;
+}
+header{
+  padding:20px 5%;display:flex;align-items:center;
+  justify-content:space-between;gap:15px;flex-wrap:wrap;
+  border-bottom:1px solid var(--border);
+}
+.logo{display:flex;align-items:center;gap:12px}
+.logo-icon{
+  width:45px;height:45px;border-radius:14px;
+  display:grid;place-items:center;font-size:25px;
+  background:linear-gradient(135deg,#9e7bff,#593bd5);
+  box-shadow:0 0 25px #7958ff55;
+}
+h1{font-size:21px;margin:0}
+.logo p{margin:4px 0 0;color:var(--muted);font-size:12px}
+button,input,select{font:inherit}
+button{
+  cursor:pointer;border:1px solid var(--border);
+  background:var(--panel2);color:var(--text);
+  padding:10px 14px;border-radius:10px;
+  transition:.2s;
+}
+button:hover{border-color:var(--accent);transform:translateY(-1px)}
+button:focus-visible,input:focus-visible,select:focus-visible{
+  outline:2px solid var(--accent);outline-offset:2px
+}
+main{max-width:1500px;margin:auto;padding:25px 4% 45px}
+.hero{margin:10px 0 25px}
+.eyebrow{
+  color:var(--accent);letter-spacing:3px;
+  font-size:11px;font-weight:bold
+}
+.hero h2{font-size:clamp(27px,4vw,43px);margin:12px 0}
+.hero h2 span{
+  background:linear-gradient(90deg,#bd9cff,#6e9cff);
+  -webkit-background-clip:text;background-clip:text;color:transparent
+}
+.hero p{color:var(--muted);line-height:1.7;max-width:680px}
+.stats{display:flex;gap:12px;flex-wrap:wrap;margin-top:22px}
+.stat{
+  background:var(--panel);border:1px solid var(--border);
+  padding:13px 17px;border-radius:13px;min-width:110px
+}
+.stat strong{display:block;font-size:23px;color:var(--accent)}
+.stat small{color:var(--muted)}
+.toolbar{
+  display:flex;gap:10px;flex-wrap:wrap;margin:22px 0 14px
+}
+.toolbar input,.toolbar select{
+  background:var(--panel);color:var(--text);
+  border:1px solid var(--border);border-radius:10px;
+  padding:12px;min-width:0
+}
+.toolbar input{flex:1;min-width:190px}
+.toolbar select{max-width:100%}
+.legend{display:flex;gap:8px;flex-wrap:wrap;margin:15px 0 20px}
+.legend button{font-size:11px;padding:8px 10px}
+.legend button.active{outline:2px solid var(--accent)}
+.table-wrap{
+  overflow-x:auto;padding:5px 2px 15px;
+  scrollbar-color:var(--accent) var(--panel)
+}
+.periodic{
+  display:grid;grid-template-columns:repeat(18,minmax(47px,1fr));
+  grid-template-rows:repeat(7,75px);gap:5px;min-width:940px
+}
+.element{
+  position:relative;border:1px solid var(--border);
+  border-radius:8px;padding:5px 3px;text-align:center;
+  background:var(--panel);cursor:pointer;overflow:hidden;
+  transition:transform .18s,box-shadow .18s,opacity .18s;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  color:var(--text);min-width:0
+}
+.element:hover{
+  transform:translateY(-3px);z-index:2;
+  box-shadow:0 0 18px var(--glow,#9b87ff55);
+  border-color:var(--color)
+}
+.element.selected{outline:2px solid var(--color);box-shadow:0 0 16px var(--glow)}
+.element .num{font-size:9px;align-self:flex-start;margin-left:3px;color:var(--muted)}
+.element .sym{font-size:20px;font-weight:800;color:var(--color)}
+.element .ename{font-size:9px;white-space:nowrap;overflow:hidden;max-width:100%}
+.element .mass{font-size:8px;color:var(--muted);margin-top:2px}
+.element.dimmed{opacity:.12}
+.series-title{grid-column:1/-1;font-size:12px;color:var(--muted);padding:10px 0 0}
+.series{
+ display:grid;grid-template-columns:repeat(15,minmax(47px,1fr));
+ gap:5px;min-width:780px;margin:7px 0 0 0
+}
+.series .element{height:70px}
+.section-heading{font-size:19px;margin:30px 0 15px}
+.panel{
+  background:var(--panel);border:1px solid var(--border);
+  border-radius:18px;padding:20px;min-width:0
+}
+.details-grid{
+ display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);
+ gap:16px;margin-top:22px
+}
+.element-heading{display:flex;gap:15px;align-items:center}
+.big-symbol{
+ width:100px;height:105px;border-radius:17px;
+ display:grid;place-items:center;background:var(--panel2);
+ border:1px solid var(--color,var(--accent));flex-shrink:0
+}
+.big-symbol strong{font-size:43px;color:var(--color,var(--accent))}
+.big-symbol small{font-size:12px;color:var(--muted)}
+.pill{
+ display:inline-block;border:1px solid var(--color,var(--accent));
+ border-radius:99px;padding:5px 9px;font-size:11px;
+ color:var(--color,var(--accent));margin-top:7px
+}
+.description{color:var(--muted);line-height:1.65;font-size:13px}
+.properties{
+ display:grid;grid-template-columns:repeat(2,minmax(0,1fr));
+ gap:9px;margin-top:18px
+}
+.property{
+ background:var(--panel2);padding:12px;border-radius:11px;
+ overflow-wrap:anywhere
+}
+.property small{display:block;color:var(--muted);font-size:11px;margin-bottom:7px}
+.property strong{font-size:14px}
+.atom-stage{
+ height:280px;display:grid;place-items:center;position:relative;
+ overflow:hidden;border-radius:14px;background:var(--panel2)
+}
+.atom{
+ width:200px;height:200px;position:relative;
+ display:grid;place-items:center
+}
+.shell{
+ position:absolute;border:1px solid #9e8aff77;
+ border-radius:50%;left:50%;top:50%;transform:translate(-50%,-50%);
+}
+.shell:nth-child(1){width:55px;height:55px}
+.shell:nth-child(2){width:95px;height:95px}
+.shell:nth-child(3){width:135px;height:135px}
+.shell:nth-child(4){width:175px;height:175px}
+.nucleus{
+ z-index:2;width:27px;height:27px;border-radius:50%;
+ background:radial-gradient(circle at 30% 30%,#ffc7fa,#a34bfa 65%,#5c2db7);
+ box-shadow:0 0 20px #a34bfa
+}
+.electron{
+ position:absolute;width:9px;height:9px;border-radius:50%;
+ background:#63dfff;box-shadow:0 0 12px #63dfff;
+ left:50%;top:0;transform:translate(-50%,-50%);
+}
+.electron-track{
+ position:absolute;inset:0;border-radius:50%;
+ animation:orbit 3s linear infinite
+}
+@keyframes orbit{to{transform:rotate(360deg)}}
+.particle-row{display:flex;gap:9px;flex-wrap:wrap;margin-top:15px}
+.particle{
+ flex:1;min-width:80px;background:var(--panel2);
+ padding:12px;border-radius:12px;text-align:center
+}
+.particle b{display:block;font-size:21px}
+.proton{color:#ff777e}.neutron{color:#b5a1ff}.electron-color{color:#63dfff}
+.config{
+ padding:14px;border-radius:12px;background:var(--panel2);
+ margin:10px 0;overflow-wrap:anywhere
+}
+.config small{display:block;color:var(--muted);margin-bottom:8px}
+.config strong{line-height:1.9}
+.orbitals{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.orbital{
+ flex:1;min-width:75px;text-align:center;
+ padding:12px 5px;background:var(--panel2);border-radius:12px
+}
+.orbital svg{width:65px;height:52px;max-width:100%}
+.orbital strong{display:block;margin-top:5px}
+.quiz-options{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:16px}
+.quiz-options button{text-align:left}
+.feedback{font-size:13px;margin-top:12px;min-height:20px;color:var(--accent)}
+footer{
+ border-top:1px solid var(--border);text-align:center;
+ color:var(--muted);padding:22px;font-size:12px
+}
+@media(max-width:750px){
+ main{padding:18px 4% 35px}
+ .details-grid{grid-template-columns:1fr}
+ .periodic{grid-template-rows:repeat(7,65px)}
+ .element .sym{font-size:17px}
+ .element .ename{font-size:8px}
+ .big-symbol{width:82px;height:90px}
+ .quiz-options{grid-template-columns:1fr}
+ header{padding:15px 4%}
+}
+</style>
+</head>
+
+<body>
+<header>
+  <div class="logo">
+    <div class="logo-icon">⚛</div>
+    <div>
+      <h1>Periodic Space</h1>
+      <p>INTERACTIVE CHEMISTRY LAB</p>
+    </div>
+  </div>
+  <button id="themeBtn" onclick="toggleTheme()">☀️ Mode Terang</button>
+</header>
+
+<main>
+  <section class="hero">
+    <div class="eyebrow">EXPLORE • DISCOVER • UNDERSTAND</div>
+    <h2>Discover the <span>Universe of Elements.</span></h2>
+    <p>
+      Jelajahi 118 unsur kimia, pelajari struktur atom, pahami konfigurasi
+      elektron, dan temukan keajaiban tabel periodik secara interaktif.
+    </p>
+    <div class="stats">
+      <div class="stat"><strong>118</strong><small>Unsur kimia</small></div>
+      <div class="stat"><strong>18</strong><small>Golongan</small></div>
+      <div class="stat"><strong>7</strong><small>Periode</small></div>
+    </div>
+  </section>
+
+  <h3 class="section-heading">✦ Element Explorer</h3>
+  <div class="toolbar">
+    <input id="search" placeholder="🔍 Cari unsur, simbol, nomor atom..." oninput="renderTable()">
+    <select id="category" onchange="renderTable()">
+      <option value="">Semua kategori</option>
+      <option value="alkali">Logam alkali</option>
+      <option value="alkaline">Logam alkali tanah</option>
+      <option value="transition">Logam transisi</option>
+      <option value="post">Logam pascatransisi</option>
+      <option value="metalloid">Metaloid</option>
+      <option value="nonmetal">Nonlogam</option>
+      <option value="halogen">Halogen</option>
+      <option value="noble">Gas mulia</option>
+      <option value="lanth">Lantanida</option>
+      <option value="act">Aktinida</option>
+    </select>
+    <button onclick="resetFilters()">Reset</button>
+  </div>
+
+  <div class="legend" id="legend"></div>
+  <div class="table-wrap">
+    <div class="periodic" id="periodic"></div>
+    <div class="series-title">LANTANIDA — PERIODE 6</div>
+    <div class="series" id="lanthSeries"></div>
+    <div class="series-title">AKTINIDA — PERIODE 7</div>
+    <div class="series" id="actSeries"></div>
+  </div>
+  <p class="description">Pilih salah satu unsur untuk melihat informasi atom dan konfigurasi elektronnya.</p>
+
+  <h3 class="section-heading">✦ Element Detail</h3>
+  <section class="details-grid">
+    <div class="panel" id="elementInfo" aria-live="polite"></div>
+    <div class="panel">
+      <h3 style="margin-top:0">Atomic Structure</h3>
+      <p class="description">Model Bohr • Elektron pada kulit atom</p>
+      <div class="atom-stage">
+        <div class="atom" id="atom">
+          <div class="shell"></div><div class="shell"></div>
+          <div class="shell"></div><div class="shell"></div>
+          <div class="nucleus"></div>
+        </div>
+      </div>
+      <div class="particle-row" id="particles"></div>
+      <p class="description">Model ini merupakan ilustrasi pembelajaran. Jumlah neutron menggunakan nomor massa perkiraan untuk unsur yang dipilih.</p>
+    </div>
+  </section>
+
+  <section class="panel" style="margin-top:16px">
+    <h3 style="margin-top:0">✦ Konfigurasi Elektron</h3>
+    <div class="details-grid">
+      <div>
+        <div class="config">
+          <small>Konfigurasi kulit (model Bohr)</small>
+          <strong id="bohrConfig">1</strong>
+        </div>
+        <div class="config">
+          <small>Konfigurasi elektron mekanika kuantum</small>
+          <strong id="quantumConfig">1s¹</strong>
+        </div>
+        <p class="description">Urutan orbital mengikuti prinsip Aufbau untuk unsur netral. Beberapa unsur memiliki konfigurasi khusus, sehingga hasil sederhana ini tidak menggantikan data spektroskopi resmi.</p>
+      </div>
+      <div>
+        <h4>Orbital atom</h4>
+        <div class="orbitals">
+          <div class="orbital">
+            <svg viewBox="0 0 80 60"><circle cx="40" cy="30" r="19" fill="#9275ff55" stroke="#b9a7ff" stroke-width="2"/><circle cx="40" cy="30" r="4" fill="#f5f3ff"/></svg>
+            <strong>s orbital</strong>
+            <small class="description">Bentuk bola</small>
+          </div>
+          <div class="orbital">
+            <svg viewBox="0 0 80 60"><ellipse cx="29" cy="30" rx="12" ry="21" fill="#62dfff88"/><ellipse cx="51" cy="30" rx="12" ry="21" fill="#9275ff88"/><circle cx="40" cy="30" r="3" fill="#fff"/></svg>
+            <strong>p orbital</strong>
+            <small class="description">Dua lobus</small>
+          </div>
+          <div class="orbital">
+            <svg viewBox="0 0 80 60"><ellipse cx="40" cy="30" rx="29" ry="10" fill="#b39bff66" stroke="#b39bff"/><ellipse cx="40" cy="30" rx="10" ry="25" fill="#62dfff66" stroke="#62dfff"/><circle cx="40" cy="30" r="3" fill="#fff"/></svg>
+            <strong>d orbital</strong>
+            <small class="description">Bentuk kompleks</small>
+          </div>
+          <div class="orbital">
+            <svg viewBox="0 0 80 60"><ellipse cx="40" cy="30" rx="30" ry="9" fill="#9275ff55" stroke="#b39bff"/><ellipse cx="40" cy="30" rx="9" ry="27" fill="#62dfff55" stroke="#62dfff"/><ellipse cx="40" cy="30" rx="24" ry="17" fill="none" stroke="#b39bff"/></svg>
+            <strong>f orbital</strong>
+            <small class="description">Bentuk lebih kompleks</small>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <h3 class="section-heading">✦ Chemistry Challenge</h3>
+  <section class="panel">
+    <div style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap">
+      <div>
+        <div class="eyebrow">TEST YOUR KNOWLEDGE</div>
+        <h3 id="quizQuestion">Unsur dengan simbol O adalah...</h3>
+      </div>
+      <div class="stat"><strong id="score">0</strong><small>Skor</small></div>
+    </div>
+    <div class="quiz-options" id="quizOptions"></div>
+    <div class="feedback" id="feedback" aria-live="polite"></div>
+    <button onclick="nextQuiz()">Pertanyaan berikutnya →</button>
+  </section>
+</main>
+
+<footer>
+  PERIODIC SPACE © 2026 • Dibuat untuk pembelajaran kimia interaktif
+</footer>
+
+<script>
+// Data unsur: nomor atom, simbol, nama, massa atom, kategori, periode, golongan.
+const raw = `
+H|Hydrogen|1.008|nonmetal|1|1
+He|Helium|4.0026|noble|1|18
+Li|Lithium|6.94|alkali|2|1
+Be|Beryllium|9.0122|alkaline|2|2
+B|Boron|10.81|metalloid|2|13
+C|Carbon|12.011|nonmetal|2|14
+N|Nitrogen|14.007|nonmetal|2|15
+O|Oxygen|15.999|nonmetal|2|16
+F|Fluorine|18.998|halogen|2|17
+Ne|Neon|20.180|noble|2|18
+Na|Sodium|22.990|alkali|3|1
+Mg|Magnesium|24.305|alkaline|3|2
+Al|Aluminium|26.982|post|3|13
+Si|Silicon|28.085|metalloid|3|14
+P|Phosphorus|30.974|nonmetal|3|15
+S|Sulfur|32.06|nonmetal|3|16
+Cl|Chlorine|35.45|halogen|3|17
+Ar|Argon|39.948|noble|3|18
+K|Potassium|39.098|alkali|4|1
+Ca|Calcium|40.078|alkaline|4|2
+Sc|Scandium|44.956|transition|4|3
+Ti|Titanium|47.867|transition|4|4
+V|Vanadium|50.942|transition|4|5
+Cr|Chromium|51.996|transition|4|6
+Mn|Manganese|54.938|transition|4|7
+Fe|Iron|55.845|transition|4|8
+Co|Cobalt|58.933|transition|4|9
+Ni|Nickel|58.693|transition|4|10
+Cu|Copper|63.546|transition|4|11
+Zn|Zinc|65.38|transition|4|12
+Ga|Gallium|69.723|post|4|13
+Ge|Germanium|72.630|metalloid|4|14
+As|Arsenic|74.922|metalloid|4|15
+Se|Selenium|78.971|nonmetal|4|16
+Br|Bromine|79.904|halogen|4|17
+Kr|Krypton|83.798|noble|4|18
+Rb|Rubidium|85.468|alkali|5|1
+Sr|Strontium|87.62|alkaline|5|2
+Y|Yttrium|88.906|transition|5|3
+Zr|Zirconium|91.224|transition|5|4
+Nb|Niobium|92.906|transition|5|5
+Mo|Molybdenum|95.95|transition|5|6
+Tc|Technetium|98|transition|5|7
+Ru|Ruthenium|101.07|transition|5|8
+Rh|Rhodium|102.906|transition|5|9
+Pd|Palladium|106.42|transition|5|10
+Ag|Silver|107.868|transition|5|11
+Cd|Cadmium|112.414|transition|5|12
+In|Indium|114.818|post|5|13
+Sn|Tin|118.710|post|5|14
+Sb|Antimony|121.760|metalloid|5|15
+Te|Tellurium|127.60|metalloid|5|16
+I|Iodine|126.904|halogen|5|17
+Xe|Xenon|131.293|noble|5|18
+Cs|Caesium|132.905|alkali|6|1
+Ba|Barium|137.327|alkaline|6|2
+La|Lanthanum|138.905|lanth|6|3
+Ce|Cerium|140.116|lanth|6|4
+Pr|Praseodymium|140.908|lanth|6|5
+Nd|Neodymium|144.242|lanth|6|6
+Pm|Promethium|145|lanth|6|7
+Sm|Samarium|150.36|lanth|6|8
+Eu|Europium|151.964|lanth|6|9
+Gd|Gadolinium|157.25|lanth|6|10
+Tb|Terbium|158.925|lanth|6|11
+Dy|Dysprosium|162.500|lanth|6|12
+Ho|Holmium|164.930|lanth|6|13
+Er|Erbium|167.259|lanth|6|14
+Tm|Thulium|168.934|lanth|6|15
+Yb|Ytterbium|173.045|lanth|6|16
+Lu|Lutetium|174.967|lanth|6|17
+Hf|Hafnium|178.49|transition|6|4
+Ta|Tantalum|180.948|transition|6|5
+W|Tungsten|183.84|transition|6|6
+Re|Rhenium|186.207|transition|6|7
+Os|Osmium|190.23|transition|6|8
+Ir|Iridium|192.217|transition|6|9
+Pt|Platinum|195.084|transition|6|10
+Au|Gold|196.967|transition|6|11
+Hg|Mercury|200.592|transition|6|12
+Tl|Thallium|204.38|post|6|13
+Pb|Lead|207.2|post|6|14
+Bi|Bismuth|208.980|post|6|15
+Po|Polonium|209|post|6|16
+At|Astatine|210|halogen|6|17
+Rn|Radon|222|noble|6|18
+Fr|Francium|223|alkali|7|1
+Ra|Radium|226|alkaline|7|2
+Ac|Actinium|227|act|7|3
+Th|Thorium|232.038|act|7|4
+Pa|Protactinium|231.036|act|7|5
+U|Uranium|238.029|act|7|6
+Np|Neptunium|237|act|7|7
+Pu|Plutonium|244|act|7|8
+Am|Americium|243|act|7|9
+Cm|Curium|247|act|7|10
+Bk|Berkelium|247|act|7|11
+Cf|Californium|251|act|7|12
+Es|Einsteinium|252|act|7|13
+Fm|Fermium|257|act|7|14
+Md|Mendelevium|258|act|7|15
+No|Nobelium|259|act|7|16
+Lr|Lawrencium|266|act|7|17
+Rf|Rutherfordium|267|transition|7|4
+Db|Dubnium|268|transition|7|5
+Sg|Seaborgium|269|transition|7|6
+Bh|Bohrium|270|transition|7|7
+Hs|Hassium|277|transition|7|8
+Mt|Meitnerium|278|transition|7|9
+Ds|Darmstadtium|281|transition|7|10
+Rg|Roentgenium|282|transition|7|11
+Cn|Copernicium|285|transition|7|12
+Nh|Nihonium|286|post|7|13
+Fl|Flerovium|289|post|7|14
+Mc|Moscovium|290|post|7|15
+Lv|Livermorium|293|post|7|16
+Ts|Tennessine|294|halogen|7|17
+Og|Oganesson|294|noble|7|18
+`.trim();
+
+const colors = {
+ alkali:"#ff8a78", alkaline:"#ffbd70", transition:"#b69aff",
+ post:"#75baff", metalloid:"#57d9cb", nonmetal:"#80d8a5",
+ halogen:"#e7a2fa", noble:"#72c9ff", lanth:"#f3a6d5", act:"#ff9dba"
+};
+const categoryNames = {
+ alkali:"Logam alkali",alkaline:"Logam alkali tanah",
+ transition:"Logam transisi",post:"Logam pascatransisi",
+ metalloid:"Metaloid",nonmetal:"Nonlogam",halogen:"Halogen",
+ noble:"Gas mulia",lanth:"Lantanida",act:"Aktinida"
+};
+const elements = raw.split("\n").map((line,i)=>{
+ const [symbol,name,mass,cat,period,group] = line.split("|");
+ return {z:i+1,symbol,name,mass:Number(mass),cat,period:+period,group:+group};
+});
+const bySymbol = Object.fromEntries(elements.map(e=>[e.symbol,e]));
+const lanths = elements.filter(e=>e.cat==="lanth");
+const acts = elements.filter(e=>e.cat==="act");
+const special = {Cr:"[Ar] 3d⁵ 4s¹",Cu:"[Ar] 3d¹⁰ 4s¹",Nb:"[Kr] 4d⁴ 5s¹",Mo:"[Kr] 4d⁵ 5s¹",Ru:"[Kr] 4d⁷ 5s¹",Rh:"[Kr] 4d⁸ 5s¹",Pd:"[Kr] 4d¹⁰",Ag:"[Kr] 4d¹⁰ 5s¹",Pt:"[Xe] 4f¹⁴ 5d⁹ 6s¹",Au:"[Xe] 4f¹⁴ 5d¹⁰ 6s¹",La:"[Xe] 5d¹ 6s²",Ce:"[Xe] 4f¹ 5d¹ 6s²",Gd:"[Xe] 4f⁷ 5d¹ 6s²",Ac:"[Rn] 6d¹ 7s²",Th:"[Rn] 6d² 7s²",Pa:"[Rn] 5f² 6d¹ 7s²",U:"[Rn] 5f³ 6d¹ 7s²",Np:"[Rn] 5f⁴ 6d¹ 7s²",Cm:"[Rn] 5f⁷ 6d¹ 7s²",Lr:"[Rn] 5f¹⁴ 7s² 7p¹"};
+
+let selected = bySymbol.C;
+let activeCategory = "";
+let score = 0;
+let quizIndex = 0;
+
+function escapeHTML(s){
+ return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+}
+function colorFor(e){return colors[e.cat]||"#b69aff"}
+
+function renderLegend(){
+ const cats = [...new Set(elements.map(e=>e.cat))];
+ document.getElementById("legend").innerHTML =
+ `<button class="${!activeCategory?"active":""}" onclick="setCategory('')">Semua</button>`+
+ cats.map(cat=>`<button class="${activeCategory===cat?"active":""}" style="--accent:${colors[cat]}" onclick="setCategory('${cat}')">${categoryNames[cat]}</button>`).join("");
+}
+function setCategory(cat){
+ activeCategory=activeCategory===cat?"":cat;
+ document.getElementById("category").value=activeCategory;
+ renderTable();
+}
+function resetFilters(){
+ document.getElementById("search").value="";
+ document.getElementById("category").value="";
+ activeCategory="";
+ renderTable();
+}
+function elementButton(e,series=false){
+ const color=colorFor(e);
+ return `<button class="element ${selected.z===e.z?"selected":""}" data-z="${e.z}"
+ style="--color:${color};--glow:${color}55;${series?"height:70px":""}"
+ onclick="selectElement(${e.z})" title="${e.z} ${e.name}">
+ <span class="num">${e.z}</span><span class="sym">${e.symbol}</span>
+ <span class="ename">${e.name}</span><span class="mass">${e.mass}</span></button>`;
+}
+function renderTable(){
+ const search=document.getElementById("search").value.toLowerCase().trim();
+ const cat=document.getElementById("category").value||activeCategory;
+ activeCategory=cat;
+ renderLegend();
+ const main=document.getElementById("periodic");
+ const lbox=document.getElementById("lanthSeries");
+ const abox=document.getElementById("actSeries");
+ main.innerHTML="";lbox.innerHTML="";abox.innerHTML="";
+ const visible=e=>(!cat||e.cat===cat)&&
+ (!search||e.name.toLowerCase().includes(search)||e.symbol.toLowerCase().includes(search)||String(e.z)===search);
+ // Bentuk standar tabel periodik, dengan ruang kosong untuk seri f.
+ elements.filter(e=>e.cat!=="lanth"&&e.cat!=="act").forEach(e=>{
+   let col=e.group,row=e.period;
+   if(e.period===6&&e.group>=4)col=e.group;
+   if(e.period===7&&e.group>=4)col=e.group;
+   main.insertAdjacentHTML("beforeend",
+    `<div style="grid-column:${col};grid-row:${row}">${elementButton(e)}</div>`);
+ });
+ // La dan Ac menjadi penanda awal seri f pada tabel utama.
+ const la=bySymbol.La,ac=bySymbol.Ac;
+ if(la)main.insertAdjacentHTML("beforeend",
+ `<div style="grid-column:3;grid-row:6">${elementButton(la)}</div>`);
+ if(ac)main.insertAdjacentHTML("beforeend",
+ `<div style="grid-column:3;grid-row:7">${elementButton(ac)}</div>`);
+ lbox.innerHTML=lanths.filter(e=>e.z!==57).map(e=>elementButton(e,true)).join("");
+ abox.innerHTML=acts.filter(e=>e.z!==89).map(e=>elementButton(e,true)).join("");
+ document.querySelectorAll(".element").forEach(el=>{
+   const e=elements[+el.dataset.z-1];
+   el.classList.toggle("dimmed",!visible(e));
+ });
+}
+function getShells(z){
+ const caps=[2,8,18,32,32,18,8],result=[];
+ let left=z;
+ for(const cap of caps){const n=Math.min(left,cap);result.push(n);left-=n;if(left<=0)break;}
+ return result;
+}
+function getQuantum(z){
+ const orbitals=[
+ ["1s",2],["2s",2],["2p",6],["3s",2],["3p",6],
+ ["4s",2],["3d",10],["4p",6],["5s",2],["4d",10],
+ ["5p",6],["6s",2],["4f",14],["5d",10],["6p",6],
+ ["7s",2],["5f",14],["6d",10],["7p",6]
+ ];
+ let left=z,parts=[];
+ for(const [orb,cap] of orbitals){
+  if(left<=0)break;
+  const n=Math.min(left,cap);
+  parts.push(orb+["⁰","¹","²","³","⁴","⁵","⁶","⁷","⁸","⁹","¹⁰","¹¹","¹²","¹³","¹⁴"][n]);
+  left-=n;
+ }
+ return special[Object.keys(bySymbol).find(s=>bySymbol[s].z===z)]||parts.join(" ");
+}
+function selectElement(z){
+ selected=elements[z-1];
+ renderTable();
+ const e=selected,color=colorFor(e);
+ const shells=getShells(e.z);
+ const mass=Math.round(e.mass);
+ const neutrons=Math.max(0,mass-e.z);
+ document.getElementById("elementInfo").innerHTML=`
+ <div class="element-heading">
+  <div class="big-symbol" style="--color:${color}">
+   <div style="text-align:center"><strong>${e.symbol}</strong><br><small>No. atom ${e.z}</small></div>
+  </div>
+  <div><div class="eyebrow">ELEMENT ${String(e.z).padStart(3,"0")}</div>
+   <h2 style="margin:8px 0">${e.name}</h2>
+   <div class="pill" style="--color:${color}">${categoryNames[e.cat]}</div>
+  </div>
+ </div>
+ <p class="description">${e.name} merupakan unsur kimia dengan nomor atom ${e.z}.
+ Atom netralnya mempunyai ${e.z} proton dan ${e.z} elektron.
+ Unsur ini berada pada periode ${e.period}, golongan ${e.group}.</p>
+ <div class="properties">
+  <div class="property"><small>Nomor atom</small><strong>${e.z}</strong></div>
+  <div class="property"><small>Massa atom relatif</small><strong>${e.mass}</strong></div>
+  <div class="property"><small>Periode</small><strong>${e.period}</strong></div>
+  <div class="property"><small>Golongan</small><strong>${e.group}</strong></div>
+  <div class="property"><small>Proton</small><strong>${e.z}</strong></div>
+  <div class="property"><small>Elektron (netral)</small><strong>${e.z}</strong></div>
+ </div>`;
+ document.getElementById("particles").innerHTML=`
+ <div class="particle"><b class="proton">＋ ${e.z}</b><small>Proton</small></div>
+ <div class="particle"><b class="neutron">● ${neutrons}</b><small>Neutron*</small></div>
+ <div class="particle"><b class="electron-color">− ${e.z}</b><small>Elektron</small></div>`;
+ document.getElementById("bohrConfig").textContent=
+ shells.map((n,i)=>String.fromCharCode(75+i)+"="+n).join(" • ");
+ document.getElementById("quantumConfig").textContent=getQuantum(e.z);
+ renderAtom(shells);
+}
+function renderAtom(shells){
+ const atom=document.getElementById("atom");
+ atom.innerHTML=`<div class="nucleus" title="Inti atom"></div>`;
+ const sizes=[55,95,135,175];
+ shells.slice(0,4).forEach((n,i)=>{
+  const shell=document.createElement("div");
+  shell.className="shell";
+  shell.style.width=sizes[i]+"px";shell.style.height=sizes[i]+"px";
+  atom.appendChild(shell);
+  for(let j=0;j<n;j++){
+   const track=document.createElement("div");
+   track.className="electron-track";
+   track.style.transform=`rotate(${j*360/n}deg)`;
+   track.style.animationDuration=(2.8+i*1.2)+"s";
+   const electron=document.createElement("div");
+   electron.className="electron";
+   electron.style.top="0";electron.style.left="50%";
+   track.appendChild(electron);shell.appendChild(track);
+  }
+ });
+}
+function toggleTheme(){
+ document.body.classList.toggle("light");
+ document.getElementById("themeBtn").textContent=
+ document.body.classList.contains("light")?"🌙 Mode Gelap":"☀️ Mode Terang";
+}
+const quizzes=[
+ {q:"Unsur dengan simbol O adalah...",a:["Oksigen","Emas","Osmium","Oganesson"],correct:0},
+ {q:"Nomor atom menunjukkan jumlah...",a:["Neutron","Proton","Kulit atom","Orbital"],correct:1},
+ {q:"Gas mulia berada di golongan...",a:["1","2","17","18"],correct:3},
+ {q:"Simbol kimia untuk besi adalah...",a:["Bi","Be","Fe","F"],correct:2},
+ {q:"Partikel bermuatan negatif adalah...",a:["Proton","Neutron","Elektron","Nukleon"],correct:2},
+ {q:"Unsur dengan simbol Na adalah...",a:["Nitrogen","Natrium","Nikel","Neon"],correct:1},
+ {q:"Jumlah elektron atom netral dengan nomor atom 8 adalah...",a:["6","8","10","16"],correct:1},
+ {q:"Unsur halogen terletak pada golongan...",a:["1","2","17","18"],correct:2}
+];
+function showQuiz(){
+ const q=quizzes[quizIndex%quizzes.length];
+ document.getElementById("quizQuestion").textContent=q.q;
+ document.getElementById("quizOptions").innerHTML=q.a.map((a,i)=>
+ `<button onclick="answerQuiz(${i})">${String.fromCharCode(65+i)}. ${a}</button>`).join("");
+ document.getElementById("feedback").textContent="";
+}
+function answerQuiz(i){
+ const q=quizzes[quizIndex%quizzes.length];
+ const buttons=document.querySelectorAll("#quizOptions button");
+ buttons.forEach(b=>b.disabled=true);
+ if(i===q.correct){
+  score+=10;
+  document.getElementById("feedback").textContent="Benar! +10 poin ✨";
+ }else{
+  document.getElementById("feedback").textContent=
+  "Belum tepat. Jawaban yang benar: "+q.a[q.correct]+".";
+ }
+ document.getElementById("score").textContent=score;
+}
+function nextQuiz(){quizIndex++;showQuiz()}
+
+renderTable();
+selectElement(6);
+showQuiz();
+</script>
+</body>
+</html>
